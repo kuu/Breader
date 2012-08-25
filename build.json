@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "vendorDir": "vendor",
+    "binDir": "bin",
+    "closure-compiler-jar": "${vendorDir}/google-closure-compiler/compiler.jar"
+  },
+
+  "targets": {
+    "all": {
+      "builder": "closure-compiler",
+      "compilationLevel": "SIMPLE_OPTIMIZATIONS",
+      "outputs": "${binDir}/breader.js",
+      "resources": [
+        {
+          "type": "files",
+          "root": "src",
+          "files": [
+            "reader.js"
+          ]
+        }
+      ]
+    }
+  }
+}

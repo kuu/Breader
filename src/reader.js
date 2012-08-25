@@ -44,6 +44,16 @@
   Breader.prototype = /** @lends {Breader#} */ {
 
     /**
+     * Gets a subarray from the given index to the length;
+     * @param {Number} pFrom The index to start from.
+     * @param {Number} pLength The length from pFrom to end at.
+     * @return {Array} The sub array.
+     */
+    sub: function(pFrom, pLength) {
+      return new Uint8Array(this.b, pFrom, pLength);
+    },
+
+    /**
      * Align the current bits to the nearest large byte.
      */
     a: function() {

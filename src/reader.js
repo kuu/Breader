@@ -50,7 +50,7 @@
      * @return {Array} The sub array.
      */
     sub: function(pFrom, pLength) {
-      return new Uint8Array(this.b, pFrom, pLength);
+      return new Uint8Array(this.b.buffer, pFrom, pLength);
     },
 
     /**

@@ -181,6 +181,34 @@
     },
 
     /**
+     * Reads a IEEE Float32 value.
+     * @return {Number} The float.
+     */
+    F32: function() {
+      // TODO: This is a major hack. Is it ok?
+      var tIndex = this.i;
+      if (tIndex + 4 > this.fileSize) {
+        throw new Error('Index out of bounds.');
+      }
+      this.i = tIndex += 4;
+      return (new Float32Array(this.b.buffer, tIndex, 1))[0];
+    },
+
+    /**
+     * Reads a IEEE Float64 value.
+     * @return {Number} The float.
+     */
+    F64: function() {
+      // TODO: This is a major hack. Is it ok?
+      var tIndex = this.i;
+      if (tIndex + 8 > this.fileSize) {
+        throw new Error('Index out of bounds.');
+      }
+      this.i = tIndex += 8;
+      return (new Float64Array(this.b.buffer, tIndex, 1))[0];
+    },
+
+    /**
      * Reads a signed number from bits.
      * @param {Number} pNumber The number of bits to read.
      * @return {Number} The bits.
@@ -249,6 +277,18 @@
         (tBuffer[tIndex + 1] << 8) |
         tBuffer[tIndex];
       this.i += 4;
+      return tResult;
+    },
+
+    /**
+     * Reads a 2 byte signed integer.
+     * @return {number} The number.
+     */
+    SI16: function() {
+      var tResult = this.I16();
+      if (tResult >> 1) {
+        tResult -= 1 << 1;
+      }
       return tResult;
     },
 

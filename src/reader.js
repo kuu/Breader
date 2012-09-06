@@ -190,8 +190,8 @@
       if (tIndex + 4 > this.fileSize) {
         throw new Error('Index out of bounds.');
       }
-      this.i = tIndex += 4;
-      return (new Float32Array(this.b.buffer, tIndex, 1))[0];
+      this.i += 4;
+      return (new DataView(this.b.buffer, this.b.byteOffset + tIndex, 4)).getFloat32(0, true);
     },
 
     /**
@@ -204,8 +204,8 @@
       if (tIndex + 8 > this.fileSize) {
         throw new Error('Index out of bounds.');
       }
-      this.i = tIndex += 8;
-      return (new Float64Array(this.b.buffer, tIndex, 1))[0];
+      this.i += 8;
+      return (new DataView(this.b.buffer, this.b.byteOffset + tIndex, 8)).getFloat64(0, true);
     },
 
     /**

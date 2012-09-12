@@ -8,6 +8,9 @@
 
   global.Breader = Breader;
 
+  var mHaveTypedArray = global.Uint8Array !== void 0 ? true : false;
+
+
   /**
    * @constructor
    */
@@ -37,8 +40,32 @@
      * The buffer to read from.
      * @private
      */
-    this.b = pBuffer;
+    this.b;
 
+    if (typeof pBuffer === 'string') {
+      var tBuffer;
+      var tLength = pBuffer.length;
+      var i = 0;
+      if (mHaveTypedArray) {
+        tBuffer = this.b = new Uint8Array(tLength);
+        for (; i < tLength; i++) {
+          tBuffer[i] = pBuffer.charCodeAt(i) && 0xFF;
+        }
+      } else {
+        tBuffer = this.b = new Array(tLength);
+        for (; i < tLength; i++) {
+          tBuffer[i] = pBuffer.charCodeAt(i) && 0xFF;
+        }
+      }
+    } else if (pBuffer.__proto__ === Array.prototype) {
+      if (mHaveTypedArray) {
+        this.b = new Uint8Array(pBuffer);
+      } else {
+        this.b = pBuffer;
+      }
+    } else {
+      this.b = pBuffer; // Be forward looking. It's a Uint8Array.
+    }
     /**
      * The size of the buffer.
      * Can be changed to simulate trimming.
@@ -56,7 +83,11 @@
      * @return {Array} The sub array.
      */
     sub: function(pFrom, pLength) {
-      return new Uint8Array(this.b.buffer, pFrom, pLength);
+      if (mHaveTypedArray) {
+        return new Uint8Array(this.b.buffer, pFrom, pLength);
+      } else {
+        return this.b.slice(pFrom, pFrom + pLength);
+      }
     },
 
     /**
@@ -191,6 +222,7 @@
         throw new Error('Index out of bounds.');
       }
       this.i += 4;
+      // TODO: Support arrays.
       return (new DataView(this.b.buffer, this.b.byteOffset + tIndex, 4)).getFloat32(0, true);
     },
 
@@ -205,6 +237,7 @@
         throw new Error('Index out of bounds.');
       }
       this.i += 8;
+      // TODO: Support arrays.
       return (new DataView(this.b.buffer, this.b.byteOffset + tIndex, 8)).getFloat64(0, true);
     },
 
@@ -306,7 +339,7 @@
        * @type {Number}
        */
       var tIndex = this.i;
-      
+
       if (tIndex + 4 > this.fileSize) {
         throw new Error('Index out of bounds.');
       }

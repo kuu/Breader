@@ -319,8 +319,8 @@
      */
     SI16: function() {
       var tResult = this.I16();
-      if (tResult >> 1) {
-        tResult -= 1 << 1;
+      if (tResult >> 15) {
+        tResult -= 1 << 16;
       }
       return tResult;
     },
@@ -330,29 +330,10 @@
      * @return {Number} The number.
      */
     SI32: function() {
-      /**
-       * @type {Uint8Array}
-       */
-      var tBuffer = this.b;
-
-      /**
-       * @type {Number}
-       */
-      var tIndex = this.i;
-
-      if (tIndex + 4 > this.fileSize) {
-        throw new Error('Index out of bounds.');
+      var tResult = this.I32();
+      if (tResult >> 31) {
+        tResult -= Math.pow(2, 32) - 1;
       }
-
-      /**
-       * @type {Number}
-       */
-      var tResult =
-        (tBuffer[tIndex + 3] << 24) |
-        (tBuffer[tIndex + 2] << 16) |
-        (tBuffer[tIndex + 1] << 8) |
-        tBuffer[tIndex];
-      this.i += 4;
       return tResult;
     },
 

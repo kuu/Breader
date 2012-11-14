@@ -1,4 +1,6 @@
 {
+  "defaultTarget": "all",
+
   "properties": {
     "vendorDir": "vendor",
     "binDir": "bin",

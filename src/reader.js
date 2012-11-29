@@ -359,6 +359,8 @@
       var tBuffer = this.b;
       var i = this.i;
       var tChar = 0;
+      var tChar2, tChar3, tChar4;
+
       for (; ; i++) {
         tChar = tBuffer[i];
         if (tChar === 0) {
@@ -367,47 +369,44 @@
         } else if (tChar === void 0) {
           throw new Error('Index out of bounds.');
         }
+
         if (tChar < 0x80) {
           tString += String.fromCharCode(tChar);
         } else {
           // Multibyte char (UTF-8 => UCS conv.)
-          var tCharCodeList = [tChar], tEncodedStr = '';
-
           if ((tChar >>> 5) === 0x06) {
             // 2 bytes char
-            var tChar2 = tBuffer[++i];
-            if ((tChar2 >>> 6) !== 0x02) {
-              throw new Error('Invalid UTF-8 char: 0x' + tChar.toString(16) + tChar2.toString(16));
+            tChar2 = tBuffer[++i];
+            if ((tChar2 >>> 6) !== 0x02) { // Invalid UTF8. Fallback to raw bytes.
+              tString += String.fromCharCode(tChar, tChar2);
+            } else {
+              tString += String.fromCharCode(((tChar & 0x1F) << 6) + (tChar2 & 0x3F));
             }
-            tCharCodeList.push(tChar2);
-
           } else if ((tChar >>> 4) === 0x0E) {
             // 3 bytes char
-            var tChar2 = tBuffer[++i];
-            var tChar3 = tBuffer[++i];
-            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02) {
-              throw new Error('Invalid UTF-8 char: 0x' + tChar.toString(16) + tChar2.toString(16) + tChar3.toString(16));
+            tChar2 = tBuffer[++i];
+            tChar3 = tBuffer[++i];
+            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02) { // Invalid UTF8. Fallback to raw bytes.
+              tString += String.fromCharCode(tChar, tChar2, tChar3);
+            } else {
+              tString += String.fromCharCode(((tChar & 0xFF) << 12) + ((tChar2 & 0x3F) << 6) + (tChar3 & 0x3F));
             }
-            tCharCodeList.push(tChar2, tChar3);
-
           } else if ((tChar >>> 3) === 0x1E) {
             // 4 bytes char
-            var tChar2 = tBuffer[++i];
-            var tChar3 = tBuffer[++i];
-            var tChar4 = tBuffer[++i];
-            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02 || (tChar4 >>> 6) !== 0x02) {
-              throw new Error('Invalid UTF-8 char: 0x' + tChar.toString(16) + tChar2.toString(16) + tChar3.toString(16) + tChar4.toString(16));
+            tChar2 = tBuffer[++i];
+            tChar3 = tBuffer[++i];
+            tChar4 = tBuffer[++i];
+            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02 || (tChar4 >>> 6) !== 0x02) { // Invalid UTF8. Fallback to raw bytes.
+              tString += String.fromCharCode(tChar, tChar2, tChar3, tChar4);
+            } else {
+              tString += String.fromCharCode(((tChar & 0x07) << 18) + ((tChar2 & 0x3F) << 12) + (tChar3 & 0x3F) << 6) + (tChar4 & 0x3F);
             }
-            tCharCodeList.push(tChar2, tChar3, tChar4);
           }
-          // Converting multiple bytes into a single UTF-16 char.
-          for (var j = 0, jl = tCharCodeList.length; j < jl; j++) {
-            tEncodedStr += '%' + tCharCodeList[j].toString(16);
-          }
-          tString += global.decodeURIComponent(tEncodedStr);
         }
       }
+
       this.i = i;
+
       return tString;
     },
 

@@ -428,8 +428,26 @@
       }
       this.i = i;
       return tString;
-    }
+    },
 
+    /**
+     * Returns the distance to the next null in bytes. The cursor's position does not change.
+     * @return {Number} The byte length.
+     */
+    sl: function() {
+      var tBuffer = this.b, tChar;
+      var i = this.i;
+      var tMax = i + 0xFFFF;
+      for (; i <= tMax; i++) {
+        tChar = tBuffer[i];
+        if (tChar === 0) {
+          return i - this.i;
+        } else if (tChar === void 0) {
+          throw new Error('Index out of bounds.');
+        }
+      }
+      throw new Error('String is not null-terminated. Max length is ' + i - this.i - 1);
+    }
   };
 
 }(this));

@@ -352,9 +352,10 @@
 
     /**
      * Reads a string until a null character is found.
+     * @param {boolean} pOnlyUtf8 If true, the method returns null immediately after it detects a non-utf8 char.
      * @return {String} The string.
      */
-    s: function() {
+    s: function(pOnlyUtf8) {
       var tString = '';
       var tBuffer = this.b;
       var i = this.i;
@@ -377,7 +378,12 @@
           if ((tChar >>> 5) === 0x06) {
             // 2 bytes char
             tChar2 = tBuffer[++i];
-            if ((tChar2 >>> 6) !== 0x02) { // Invalid UTF8. Fallback to raw bytes.
+            if ((tChar2 >>> 6) !== 0x02) {
+              // Not UTF8. 
+              if (pOnlyUtf8) {
+                return null;
+              }
+              // Fallback to raw bytes. 
               tString += String.fromCharCode(tChar, tChar2);
             } else {
               tString += String.fromCharCode(((tChar & 0x1F) << 6) + (tChar2 & 0x3F));
@@ -386,7 +392,12 @@
             // 3 bytes char
             tChar2 = tBuffer[++i];
             tChar3 = tBuffer[++i];
-            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02) { // Invalid UTF8. Fallback to raw bytes.
+            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02) {
+              // Not UTF8. 
+              if (pOnlyUtf8) {
+                return null;
+              }
+              // Fallback to raw bytes. 
               tString += String.fromCharCode(tChar, tChar2, tChar3);
             } else {
               tString += String.fromCharCode(((tChar & 0xFF) << 12) + ((tChar2 & 0x3F) << 6) + (tChar3 & 0x3F));
@@ -396,11 +407,23 @@
             tChar2 = tBuffer[++i];
             tChar3 = tBuffer[++i];
             tChar4 = tBuffer[++i];
-            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02 || (tChar4 >>> 6) !== 0x02) { // Invalid UTF8. Fallback to raw bytes.
+            if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02 || (tChar4 >>> 6) !== 0x02) {
+              // Not UTF8. 
+              if (pOnlyUtf8) {
+                return null;
+              }
+              // Fallback to raw bytes. 
               tString += String.fromCharCode(tChar, tChar2, tChar3, tChar4);
             } else {
               tString += String.fromCharCode(((tChar & 0x07) << 18) + ((tChar2 & 0x3F) << 12) + (tChar3 & 0x3F) << 6) + (tChar4 & 0x3F);
             }
+          } else {
+            // Not UTF8. 
+            if (pOnlyUtf8) {
+              return null;
+            }
+            // Fallback to raw bytes. 
+            tString += String.fromCharCode(tChar);
           }
         }
       }

@@ -352,11 +352,10 @@
 
     /**
      * Reads a string until a null character is found.
-     * @param {Object} pParams An object for returning the aquired info. 
-     *            If exists, the method stops immediately after it detects a non-utf8 multibyte char.
+     * @param {boolean} pOnlyUtf8 If true, the method returns null immediately after it detects a non-utf8 char.
      * @return {String} The string.
      */
-    s: function(pParams) {
+    s: function(pOnlyUtf8) {
       var tString = '';
       var tBuffer = this.b;
       var i = this.i;
@@ -381,9 +380,8 @@
             tChar2 = tBuffer[++i];
             if ((tChar2 >>> 6) !== 0x02) {
               // Not UTF8. 
-              if (pParams) {
-                pParams.notUtf8 = true;
-                return;
+              if (pOnlyUtf8) {
+                return null;
               }
               // Fallback to raw bytes. 
               tString += String.fromCharCode(tChar, tChar2);
@@ -396,9 +394,8 @@
             tChar3 = tBuffer[++i];
             if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02) {
               // Not UTF8. 
-              if (pParams) {
-                pParams.notUtf8 = true;
-                return;
+              if (pOnlyUtf8) {
+                return null;
               }
               // Fallback to raw bytes. 
               tString += String.fromCharCode(tChar, tChar2, tChar3);
@@ -412,9 +409,8 @@
             tChar4 = tBuffer[++i];
             if ((tChar2 >>> 6) !== 0x02 || (tChar3 >>> 6) !== 0x02 || (tChar4 >>> 6) !== 0x02) {
               // Not UTF8. 
-              if (pParams) {
-                pParams.notUtf8 = true;
-                return;
+              if (pOnlyUtf8) {
+                return null;
               }
               // Fallback to raw bytes. 
               tString += String.fromCharCode(tChar, tChar2, tChar3, tChar4);
@@ -423,9 +419,8 @@
             }
           } else {
             // Not UTF8. 
-            if (pParams) {
-              pParams.notUtf8 = true;
-              return;
+            if (pOnlyUtf8) {
+              return null;
             }
             // Fallback to raw bytes. 
             tString += String.fromCharCode(tChar);

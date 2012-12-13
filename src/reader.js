@@ -84,7 +84,7 @@
      */
     sub: function(pFrom, pLength) {
       if (mHaveTypedArray) {
-        return new Uint8Array(this.b.buffer, pFrom, pLength);
+        return new Uint8Array(this.b.buffer, this.b.byteOffset + pFrom, pLength);
       } else {
         return this.b.slice(pFrom, pFrom + pLength);
       }
@@ -459,9 +459,7 @@
      */
     sl: function() {
       var tBuffer = this.b, tChar;
-      var i = this.i;
-      var tMax = i + 0xFFFF;
-      for (; i <= tMax; i++) {
+      for (var i = this.i, il = this.fileSize; i < il; i++) {
         tChar = tBuffer[i];
         if (tChar === 0) {
           return i - this.i;

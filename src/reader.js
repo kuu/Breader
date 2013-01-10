@@ -353,9 +353,12 @@
     /**
      * Reads a string until a null character is found.
      * @param {boolean} pOnlyUtf8 If true, the method returns null immediately after it detects a non-utf8 char.
+     * @param {boolean} pHint If true, the method returns null immediately after it encounters a charcter code greater than 127.
+     *          This is useful when the possibility of the string to contain non-UTF8 char is high.
+     *          Also note that without this flag, we cannot detect Shit-JIS's single-byte kana.
      * @return {String} The string.
      */
-    s: function(pOnlyUtf8) {
+    s: function(pOnlyUtf8, pHint) {
       var tString = '';
       var tBuffer = this.b;
       var i = this.i;
@@ -375,6 +378,10 @@
           tString += String.fromCharCode(tChar);
         } else {
           // Multibyte char (UTF-8 => UCS conv.)
+          if (pOnlyUtf8 && pHint) {
+            // The char is arguably non-UTF8.
+            return null;
+          }
           if ((tChar >>> 5) === 0x06) {
             // 2 bytes char
             tChar2 = tBuffer[++i];
